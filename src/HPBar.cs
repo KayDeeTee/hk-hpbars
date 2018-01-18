@@ -148,7 +148,10 @@ namespace HPBar
                 bossFSM = fsm.FsmComponent;
                 Log(bossFSM.FsmVariables.GetFsmInt("HP").Value);
                 canvas_group.alpha = 1;
-                health_bar.fillAmount = (float)bossFSM.FsmVariables.GetFsmInt("HP").Value / (float)maxHP;
+                if( bossFSM.gameObject.name == "Radiance" )
+                    health_bar.fillAmount = (float)(bossFSM.FsmVariables.GetFsmInt("HP").Value-1300) / (float)(maxHP-1300);
+                else
+                    health_bar.fillAmount = (float)bossFSM.FsmVariables.GetFsmInt("HP").Value / (float)maxHP;
                 if (bossFSM.FsmVariables.GetFsmInt("HP").Value <= 0 || bossFSM == null)
                     canvas_group.alpha = 0;
             }

@@ -32,6 +32,7 @@ namespace HPBar
         public static PlayMakerFSM bossFSM;
         public static int maxHP;
 
+        public static Dictionary<string, int> bosses;
 
         public override string GetVersion()
         {
@@ -41,6 +42,45 @@ namespace HPBar
         public override void Initialize()
         {
             Log("Initializing HPBars");
+
+            bosses = new Dictionary<string, int>();
+            bosses.Add( "Head", -1);                                    
+            bosses.Add( "False Knight New", -1);
+            bosses.Add( "Hornet Boss 1", -1);
+            bosses.Add( "Giant Fly", -1);
+            bosses.Add( "Mega Jellyfish", -1);
+            bosses.Add( "Mawlek Body", -1);
+            bosses.Add( "Mawlek Head", -1);
+            bosses.Add( "Mantis Lord", -1);
+            bosses.Add( "Mantis Lord S1", -1);
+            bosses.Add( "Mantis Lord S2", -1);
+            bosses.Add( "Mage Lord", -1);
+            bosses.Add( "Mage Lord Phase2", -1);
+            bosses.Add( "Infected Knight", -1);
+            bosses.Add( "Mega Zombie Beam Miner (1)", -1);
+            bosses.Add( "Zombie Beam Miner Rematch", -1);
+            bosses.Add( "Dung Defender", -1);
+            bosses.Add( "Mimic Spider", -1);
+            bosses.Add( "Hornet Boss 2", -1);
+            bosses.Add( "Fluke Mother", -1);
+            bosses.Add( "Mantis Traitor Lord", -1);
+            bosses.Add( "Grimm Boss", -1);
+            bosses.Add( "Black Knight 1", -1);
+            bosses.Add("Black Knight 2", -1);
+            bosses.Add("Black Knight 3", -1);
+            bosses.Add("Black Knight 4", -1);
+            bosses.Add("Black Knight 5", -1);
+            bosses.Add("Black Knight 6", -1);
+            bosses.Add( "Jar Collector", -1);
+            bosses.Add( "Lost Kin", -1);
+            bosses.Add( "False Knight Dream", -1);
+            bosses.Add( "Nightmare Grimm Boss", -1);
+            bosses.Add( "White Defender", -1);
+            bosses.Add( "Dream Mage Lord", -1);
+            bosses.Add( "Dream Mage Lord Phase2", -1);
+            bosses.Add( "Grey Prince", -1);
+            bosses.Add( "THK", -1);
+            bosses.Add( "Radiance", -1);
 
             bg = CanvasUtil.CreateSprite(ResourceLoader.GetBackgroundImage(), 0, 0, 1, 1);
             fg = CanvasUtil.CreateSprite(ResourceLoader.GetForegroundImage(), 0, 0, 960, 1);
@@ -86,73 +126,20 @@ namespace HPBar
         GameObject Instance_OnGetEventSenderHook(GameObject go, HutongGames.PlayMaker.Fsm fsm)
         {
             Log(fsm.GameObjectName);
-            bool update = true;
-            if (bossFSM.Fsm.GameObjectName != fsm.GameObjectName) {
-                switch (fsm.GameObjectName)
-                {
-                    case "Head": maxHP = GameManager.instance.sceneName == "Crossroads_10" ? 40 : 40; break;
-                    case "False Knight New": maxHP = 65; break;
-                    case "Hornet Boss 1": maxHP = 225; break;
-                    case "Giant Fly": maxHP = 90; break;
-                    case "Mega Jellyfish":
-                    case "Mawlek Body":
-                    case "Mawlek Head":
-                        maxHP = 300; break;
-                    case "Mantis Lord": maxHP = 210; break;
-                    case "Mantis Lord S1":
-                    case "Mantis Lord S2": maxHP = 160; break;
-                    case "Mage Lord": maxHP = 275; break;
-                    case "Mage Lord Phase2": maxHP = 110; break;
-                    case "Infected Knight": maxHP = 525; break;
-                    case "Mega Zombie Beam Miner (1)": maxHP = 280; break;
-                    case "Zombie Beam Miner Rematch": maxHP = 450; break;
-                    case "Dung Defender":
-                    case "Mimic Spider":
-                    case "Hornet Boss 2": maxHP = 700; break;
-                    case "Fluke Mother": maxHP = 350; break;
-                    case "Mantis Traitor Lord": maxHP = 360; break;
-                    case "Grimm Boss":
-                        switch (PlayerData.instance.nailSmithUpgrades)
-                        {
-                            case 3: maxHP = 930; break;
-                            case 4: maxHP = 1000; break;
-                            default: maxHP = 800; break;
-                        }
-                        break;
-                    case "Black Knight": maxHP = 220; break;
-                    case "Jar Collector": maxHP = 750; break;
-                    case "Lost Kin": maxHP = 1200; break;
-                    case "False Knight Dream": maxHP = 360; break;
-                    case "Nightmare Grimm Boss":
-                    case "White Defender": maxHP = 1600; break;
-                    case "Dream Mage Lord": maxHP = 900; break;
-                    case "Dream Mage Lord Phase2": maxHP = 350; break;
-                    case "Grey Prince":
-                        int n = PlayerData.instance.greyPrinceDefeats;
-                        if (n > 3)
-                            n = 3;
-                        maxHP = 1200 + (n * 100); break;
-                    case "Radiance": maxHP = 3000; break;
-                    default:
-                        update = false;
-                        break;
-                }
-            }
-            
 
-            if (GameManager.instance.sceneName == "Room_Final_Boss_Core")
-            {
-                maxHP = 1300;
-                update = true;
-            }
-
-            if (update)
+            if (bosses.ContainsKey(fsm.GameObjectName) || GameManager.instance.sceneName == "Room_Final_Boss_Core")
             {
                 bossFSM = fsm.FsmComponent;
                 Log(bossFSM.FsmVariables.GetFsmInt("HP").Value);
 
-                if (bossFSM.FsmVariables.GetFsmInt("HP").Value > maxHP)
-                    maxHP = bossFSM.FsmVariables.GetFsmInt("HP").Value;
+                if (GameManager.instance.sceneName == "Room_Final_Boss_Core")
+                {
+                    bossFSM.gameObject.name = "THK";
+                }
+                if (bosses[bossFSM.Fsm.GameObjectName] == -1)
+                    bosses[bossFSM.Fsm.GameObjectName] = bossFSM.FsmVariables.GetFsmInt("HP").Value;
+
+                maxHP = bosses[bossFSM.Fsm.GameObjectName];
 
                 canvas_group.alpha = 1;
                 health_bar.fillAmount = (float)bossFSM.FsmVariables.GetFsmInt("HP").Value / (float)maxHP;

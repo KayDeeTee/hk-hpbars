@@ -87,71 +87,75 @@ namespace HPBar
         {
             Log(fsm.GameObjectName);
             bool update = true;
-            switch (fsm.GameObjectName)
+            if (bossFSM.Fsm.GameObjectName != fsm.GameObjectName) {
+                switch (fsm.GameObjectName)
+                {
+                    case "Head": maxHP = GameManager.instance.sceneName == "Crossroads_10" ? 40 : 40; break;
+                    case "False Knight New": maxHP = 65; break;
+                    case "Hornet Boss 1": maxHP = 225; break;
+                    case "Giant Fly": maxHP = 90; break;
+                    case "Mega Jellyfish":
+                    case "Mawlek Body":
+                    case "Mawlek Head":
+                        maxHP = 300; break;
+                    case "Mantis Lord": maxHP = 210; break;
+                    case "Mantis Lord S1":
+                    case "Mantis Lord S2": maxHP = 160; break;
+                    case "Mage Lord": maxHP = 275; break;
+                    case "Mage Lord Phase2": maxHP = 110; break;
+                    case "Infected Knight": maxHP = 525; break;
+                    case "Mega Zombie Beam Miner (1)": maxHP = 280; break;
+                    case "Zombie Beam Miner Rematch": maxHP = 450; break;
+                    case "Dung Defender":
+                    case "Mimic Spider":
+                    case "Hornet Boss 2": maxHP = 700; break;
+                    case "Fluke Mother": maxHP = 350; break;
+                    case "Mantis Traitor Lord": maxHP = 360; break;
+                    case "Grimm Boss":
+                        switch (PlayerData.instance.nailSmithUpgrades)
+                        {
+                            case 3: maxHP = 930; break;
+                            case 4: maxHP = 1000; break;
+                            default: maxHP = 800; break;
+                        }
+                        break;
+                    case "Black Knight": maxHP = 220; break;
+                    case "Jar Collector": maxHP = 750; break;
+                    case "Lost Kin": maxHP = 1200; break;
+                    case "False Knight Dream": maxHP = 360; break;
+                    case "Nightmare Grimm Boss":
+                    case "White Defender": maxHP = 1600; break;
+                    case "Dream Mage Lord": maxHP = 900; break;
+                    case "Dream Mage Lord Phase2": maxHP = 350; break;
+                    case "Grey Prince":
+                        int n = PlayerData.instance.greyPrinceDefeats;
+                        if (n > 3)
+                            n = 3;
+                        maxHP = 1200 + (n * 100); break;
+                    case "Radiance": maxHP = 3000; break;
+                    default:
+                        update = false;
+                        break;
+                }
+            }
+            
+
+            if (GameManager.instance.sceneName == "Room_Final_Boss_Core")
             {
-                case "False Knight New":            maxHP = 65;     break;
-                case "Head":                        maxHP = GameManager.instance.sceneName == "Crossroads_10" ? 40 : 40; break;
-                case "Hornet Boss 1":               maxHP = 225;    break;
-                case "Giant Fly":                   maxHP = 90;     break;
-                case "Mega Jellyfish":
-                case "Mawlek Body":
-                case "Mawlek Head":
-                                                    maxHP = 300;    break;
-                case "Mantis Lord":                 maxHP = 210;    break;
-                case "Mantis Lord S1":
-                case "Mantis Lord S2":              maxHP = 160;    break;
-                case "Mage Lord":                   maxHP = 275;    break;
-                case "Mage Lord Phase2":            maxHP = 110;    break;
-                case "Infected Knight":             maxHP = 525;    break;
-                case "Mega Zombie Beam Miner (1)":  maxHP = 280;    break;
-                case "Zombie Beam Miner Rematch":   maxHP = 450;    break;
-                case "Dung Defender":
-                case "Mimic Spider":
-                case "Hornet Boss 2":               maxHP = 700; break;
-                case "Fluke Mother":                maxHP = 350; break;
-                case "Mantis Traitor Lord":         maxHP = 360; break;
-                case "Grimm Boss": 
-                    switch (PlayerData.instance.nailSmithUpgrades)
-                    {
-                        case 3:
-                            maxHP = 930;
-                            break;
-                        case 4:
-                            maxHP = 1000;
-                            break;
-                        default:
-                            maxHP = 800;
-                            break;
-                    }
-                    break;
-                case "Black Knight":            maxHP = 220; break;
-                case "Jar Collector":           maxHP = 750; break;
-                case "Lost Kin":                maxHP = 1200; break;
-                case "Nightmare Grimm Boss":
-                case "False Knight Dream":
-                case "White Defender":          maxHP = 1600; break;
-                case "Dream Mage Lord":         maxHP = 900; break;
-                case "Dream Mage Lord Phase2":  maxHP = 350; break;
-                case "Grey Prince":
-                    int n = PlayerData.instance.greyPrinceDefeats;
-                    if( n > 3 )
-                        n = 3;
-                    maxHP = 1200 + (n * 100); break;
-                case "Radiance":                maxHP = 3000; break;
-                default:
-                    update = false;
-                    break;  
+                maxHP = 1300;
+                update = true;
             }
 
             if (update)
             {
                 bossFSM = fsm.FsmComponent;
                 Log(bossFSM.FsmVariables.GetFsmInt("HP").Value);
+
+                if (bossFSM.FsmVariables.GetFsmInt("HP").Value > maxHP)
+                    maxHP = bossFSM.FsmVariables.GetFsmInt("HP").Value;
+
                 canvas_group.alpha = 1;
-                if( bossFSM.gameObject.name == "Radiance" )
-                    health_bar.fillAmount = (float)(bossFSM.FsmVariables.GetFsmInt("HP").Value-1300) / (float)(maxHP-1300);
-                else
-                    health_bar.fillAmount = (float)bossFSM.FsmVariables.GetFsmInt("HP").Value / (float)maxHP;
+                health_bar.fillAmount = (float)bossFSM.FsmVariables.GetFsmInt("HP").Value / (float)maxHP;
                 if (bossFSM.FsmVariables.GetFsmInt("HP").Value <= 0 || bossFSM == null)
                     canvas_group.alpha = 0;
             }
